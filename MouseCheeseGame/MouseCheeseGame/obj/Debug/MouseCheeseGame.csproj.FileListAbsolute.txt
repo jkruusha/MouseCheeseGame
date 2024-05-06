@@ -1,0 +1,9 @@
+C:\Users\jkruu\OneDrive\Рабочий стол\Задачи\MouseCheeseGame\MouseCheeseGame\bin\Debug\MouseCheeseGame.exe.config
+C:\Users\jkruu\OneDrive\Рабочий стол\Задачи\MouseCheeseGame\MouseCheeseGame\bin\Debug\MouseCheeseGame.exe
+C:\Users\jkruu\OneDrive\Рабочий стол\Задачи\MouseCheeseGame\MouseCheeseGame\bin\Debug\MouseCheeseGame.pdb
+C:\Users\jkruu\OneDrive\Рабочий стол\Задачи\MouseCheeseGame\MouseCheeseGame\obj\Debug\MouseCheeseGame.csproj.AssemblyReference.cache
+C:\Users\jkruu\OneDrive\Рабочий стол\Задачи\MouseCheeseGame\MouseCheeseGame\obj\Debug\MouseCheeseGame.Properties.Resources.resources
+C:\Users\jkruu\OneDrive\Рабочий стол\Задачи\MouseCheeseGame\MouseCheeseGame\obj\Debug\MouseCheeseGame.csproj.GenerateResource.cache
+C:\Users\jkruu\OneDrive\Рабочий стол\Задачи\MouseCheeseGame\MouseCheeseGame\obj\Debug\MouseCheeseGame.csproj.CoreCompileInputs.cache
+C:\Users\jkruu\OneDrive\Рабочий стол\Задачи\MouseCheeseGame\MouseCheeseGame\obj\Debug\MouseCheeseGame.exe
+C:\Users\jkruu\OneDrive\Рабочий стол\Задачи\MouseCheeseGame\MouseCheeseGame\obj\Debug\MouseCheeseGame.pdb
