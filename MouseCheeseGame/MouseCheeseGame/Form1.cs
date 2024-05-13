@@ -35,7 +35,7 @@ namespace MouseCheeseGame
 
             // Инициализируем таймер для движения кота
             catTimer = new Timer();
-            catTimer.Interval = 500; // Интервал в миллисекундах
+            catTimer.Interval = 400; // Интервал в миллисекундах
             catTimer.Tick += CatTimer_Tick;
             catTimer.Start();
         }
@@ -63,7 +63,7 @@ namespace MouseCheeseGame
                     if (obstacleMap[i, j])
                     {
                         //map[i, j].BackgroundImage = CreateGreenImage();
-                        map[i, j].Image = Image.FromFile(@"C:\Users\jkruu\OneDrive\Рабочий стол\Задачи\MouseCheeseGame\MouseCheeseGame\Images\cheesebg.jpg");
+                        map[i, j].Image = Image.FromFile(@"Images\cheesebg.png");
                     }
                     else
                     {
