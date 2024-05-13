@@ -10,7 +10,8 @@ namespace MouseCheeseGame
         private const int CellSize = 35;
 
         private PictureBox[,] map;
-        private PictureBox mouse, cheese, cat, trap;
+        private PictureBox mouse, cheese, cat, trap, gameTitle, cheeseTitle;
+        private Button playButton, rulesButton;
 
         private int mouseX, mouseY;
         private int cheeseX, cheeseY;
@@ -28,7 +29,75 @@ namespace MouseCheeseGame
         public Form1()
         {
             InitializeComponent();
-            
+
+            InitializeMenu(); // Добавляем входное меню
+        }
+
+        private void InitializeMenu()
+        {
+            playButton = new Button();
+            playButton.BackgroundImage = Image.FromFile(@"Images\playButton.png"); // Установка нового изображения для кнопки
+            playButton.BackgroundImageLayout = ImageLayout.Stretch;
+            playButton.Size = new Size(230, 80);
+            playButton.Location = new Point(250, 400);
+            playButton.FlatStyle = FlatStyle.Flat; // Убираем рамку
+            playButton.FlatAppearance.BorderSize = 0; // Убираем границу
+            playButton.Click += PlayButton_Click;
+            this.Controls.Add(playButton);
+
+            rulesButton = new Button();
+            rulesButton.BackgroundImage = Image.FromFile(@"Images\rulesButton.png"); // Установка нового изображения для кнопки
+            rulesButton.BackgroundImageLayout = ImageLayout.Stretch;
+            rulesButton.Size = new Size(230, 80);
+            rulesButton.Location = new Point(250, 500);
+            rulesButton.FlatStyle = FlatStyle.Flat; // Убираем рамку
+            rulesButton.FlatAppearance.BorderSize = 0; // Убираем границу
+            rulesButton.Click += RulesButton_Click;
+            this.Controls.Add(rulesButton);
+
+            // Создаем PictureBox для отображения названия игры
+            gameTitle = new PictureBox();
+            gameTitle.Image = Image.FromFile(@"Images\gameTitle.png"); // Замените "Images\game_title.png" на путь к вашему изображению
+            gameTitle.Size = new Size(550, 100); // Устанавливаем размер изображения
+            gameTitle.SizeMode = PictureBoxSizeMode.StretchImage; // Масштабируем изображение по размеру PictureBox
+            gameTitle.Location = new Point(80, 50); // Устанавливаем расположение изображения
+            this.Controls.Add(gameTitle); // Добавляем PictureBox на форму
+
+            cheeseTitle = new PictureBox();
+            cheeseTitle.Image = Image.FromFile(@"Images\cheese.png");
+            cheeseTitle.Size = new Size(250, 600);
+            cheeseTitle.SizeMode = PictureBoxSizeMode.StretchImage;
+            cheeseTitle.Location = new Point(250, 200);
+            this.Controls.Add(cheeseTitle);
+
+            // Устанавливаем размеры формы
+            this.Width = 750; // Здесь задайте ширину в пикселях
+            this.Height = 775; // Здесь задайте высоту в пикселях
+            this.BackColor = Color.FromArgb(255, 247, 153);
+
+            this.MinimumSize = new Size(this.Width, this.Height);
+            this.MaximumSize = new Size(this.Width, this.Height);
+        }
+
+        private void PlayButton_Click(object sender, EventArgs e)
+        {
+            // Здесь вызовите метод или откройте форму для начала игры
+            StartGame();
+        }
+
+        private void RulesButton_Click(object sender, EventArgs e)
+        {
+            // Здесь отобразите правила игры (можно использовать MessageBox или отдельную форму)
+            MessageBox.Show("Правила игры:\n\n1. Ваша задача - добраться до сыра, избегая кота и ловушек.\n2. Используйте клавиши W, A, S, D для перемещения мыши.\n3. Соберите 5 кусочков сыра, чтобы победить!");
+        }
+
+        private void StartGame()
+        {
+            playButton.Visible = false;
+            rulesButton.Visible = false;
+            gameTitle.Visible = false;
+            cheeseTitle.Visible = false;
+
             GenerateObstacles(1);
             InitializeMap(); // Генерируем лабиринт препятствий
             PlaceObjects(1);
@@ -205,7 +274,7 @@ namespace MouseCheeseGame
                 if (cheeseFoundCount >= 5) // Check if 5 cheese pieces are found
                 {
                     cheeseFound = true;
-                    MessageBox.Show("Вы нашли все кусочки сыра и выиграли!");
+                    ShowCongratulations();
                     ResetGame();
                 }
                 else
@@ -308,53 +377,53 @@ namespace MouseCheeseGame
             {
                 for (int j = 0; j < MapSize; j++)
                 {
-                        if (i == 0 || j == 0 || i == MapSize - 1 || j == MapSize - 1)
+                    if (i == 0 || j == 0 || i == MapSize - 1 || j == MapSize - 1)
                         obstacleMap[i, j] = true;
                 }
             }
 
             if (level == 1)
             {
-                obstacleMap[1,1] = true;
-                obstacleMap[1,10] = true;
-                obstacleMap[1,19] = true;
-                obstacleMap[2,10] = true;
-                obstacleMap[3,2] = true;
-                obstacleMap[3,3] = true;
-                obstacleMap[3,10] = true;
-                obstacleMap[3,17] = true;
-                obstacleMap[3,18] = true;
-                obstacleMap[4,5] = true;
-                obstacleMap[4,6] = true;
-                obstacleMap[4,10] = true;
-                obstacleMap[4,14] = true;
-                obstacleMap[4,15] = true;
-                obstacleMap[5,9] = true;
-                obstacleMap[5,10] = true;
-                obstacleMap[5,11] = true;
-                obstacleMap[7,2] = true;
-                obstacleMap[7,3] = true;
-                obstacleMap[7,6] = true;
-                obstacleMap[7,7] = true;
-                obstacleMap[7,8] = true;
-                obstacleMap[7,9] = true;
-                obstacleMap[7,10] = true;
-                obstacleMap[7,11] = true;
-                obstacleMap[7,12] = true;
-                obstacleMap[7,13] = true;
-                obstacleMap[7,14] = true;
-                obstacleMap[7,17] = true;
-                obstacleMap[7,18] = true;
-                obstacleMap[8,2] = true;
-                obstacleMap[8,6] = true;
-                obstacleMap[8,14] = true;
-                obstacleMap[8,18] = true;
-                obstacleMap[9,2] = true;
-                obstacleMap[9,3] = true;
-                obstacleMap[9,6] = true;
-                obstacleMap[9,9] = true;
-                obstacleMap[9,11] = true;
-                obstacleMap[9,14] = true;
+                obstacleMap[1, 1] = true;
+                obstacleMap[1, 10] = true;
+                obstacleMap[1, 19] = true;
+                obstacleMap[2, 10] = true;
+                obstacleMap[3, 2] = true;
+                obstacleMap[3, 3] = true;
+                obstacleMap[3, 10] = true;
+                obstacleMap[3, 17] = true;
+                obstacleMap[3, 18] = true;
+                obstacleMap[4, 5] = true;
+                obstacleMap[4, 6] = true;
+                obstacleMap[4, 10] = true;
+                obstacleMap[4, 14] = true;
+                obstacleMap[4, 15] = true;
+                obstacleMap[5, 9] = true;
+                obstacleMap[5, 10] = true;
+                obstacleMap[5, 11] = true;
+                obstacleMap[7, 2] = true;
+                obstacleMap[7, 3] = true;
+                obstacleMap[7, 6] = true;
+                obstacleMap[7, 7] = true;
+                obstacleMap[7, 8] = true;
+                obstacleMap[7, 9] = true;
+                obstacleMap[7, 10] = true;
+                obstacleMap[7, 11] = true;
+                obstacleMap[7, 12] = true;
+                obstacleMap[7, 13] = true;
+                obstacleMap[7, 14] = true;
+                obstacleMap[7, 17] = true;
+                obstacleMap[7, 18] = true;
+                obstacleMap[8, 2] = true;
+                obstacleMap[8, 6] = true;
+                obstacleMap[8, 14] = true;
+                obstacleMap[8, 18] = true;
+                obstacleMap[9, 2] = true;
+                obstacleMap[9, 3] = true;
+                obstacleMap[9, 6] = true;
+                obstacleMap[9, 9] = true;
+                obstacleMap[9, 11] = true;
+                obstacleMap[9, 14] = true;
                 obstacleMap[9, 17] = true;
                 obstacleMap[9, 18] = true;
                 obstacleMap[10, 6] = true;
@@ -411,6 +480,28 @@ namespace MouseCheeseGame
             }
             return bitmap;
         }
+
+        private void ShowCongratulations()
+        {
+            // Создание окна с поздравлением
+            Form congratsForm = new Form();
+            congratsForm.Text = "Победа!";
+            congratsForm.Size = new Size(400, 400);
+            congratsForm.StartPosition = FormStartPosition.CenterScreen;
+
+            // Создание PictureBox для отображения изображения
+            PictureBox congratsPictureBox = new PictureBox();
+            congratsPictureBox.Image = Image.FromFile(@"Images\mousecheese.png"); // Путь к изображению поздравления
+            congratsPictureBox.SizeMode = PictureBoxSizeMode.StretchImage;
+            congratsPictureBox.Dock = DockStyle.Fill;
+
+            // Добавление PictureBox на форму
+            congratsForm.Controls.Add(congratsPictureBox);
+
+            // Отображение окна с поздравлением
+            congratsForm.ShowDialog();
+        }
+
 
     }
 }
