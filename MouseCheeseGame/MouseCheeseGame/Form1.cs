@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
+using WMPLib;
 
 namespace MouseCheeseGame
 {
     public partial class Form1 : Form
     {
+        WindowsMediaPlayer player = new WindowsMediaPlayer();
+
         private const int MapSize = 21;
         private const int CellSize = 35;
 
@@ -31,6 +34,11 @@ namespace MouseCheeseGame
             InitializeComponent();
 
             InitializeMenu(); // Добавляем входное меню
+
+            player.URL = @"Music\music.mp3";
+            player.controls.play();
+            player.settings.volume = 10;
+            player.settings.setMode("loop", true);
         }
 
         private void InitializeMenu()

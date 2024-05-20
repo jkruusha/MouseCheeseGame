@@ -7,3 +7,9 @@ C:\Users\jkruu\OneDrive\Рабочий стол\Задачи\MouseCheeseGame\Mou
 C:\Users\jkruu\OneDrive\Рабочий стол\Задачи\MouseCheeseGame\MouseCheeseGame\obj\Debug\MouseCheeseGame.csproj.CoreCompileInputs.cache
 C:\Users\jkruu\OneDrive\Рабочий стол\Задачи\MouseCheeseGame\MouseCheeseGame\obj\Debug\MouseCheeseGame.exe
 C:\Users\jkruu\OneDrive\Рабочий стол\Задачи\MouseCheeseGame\MouseCheeseGame\obj\Debug\MouseCheeseGame.pdb
+C:\Users\jkruu\OneDrive\Рабочий стол\Задачи\MouseCheeseGame\MouseCheeseGame\bin\Debug\Interop.WMPLib.dll
+C:\Users\jkruu\OneDrive\Рабочий стол\Задачи\MouseCheeseGame\MouseCheeseGame\bin\Debug\AxInterop.WMPLib.dll
+C:\Users\jkruu\OneDrive\Рабочий стол\Задачи\MouseCheeseGame\MouseCheeseGame\obj\Debug\Interop.WMPLib.dll
+C:\Users\jkruu\OneDrive\Рабочий стол\Задачи\MouseCheeseGame\MouseCheeseGame\obj\Debug\AxInterop.WMPLib.dll
+C:\Users\jkruu\OneDrive\Рабочий стол\Задачи\MouseCheeseGame\MouseCheeseGame\obj\Debug\MouseCheeseGame.csproj.ResolveComReference.cache
+C:\Users\jkruu\OneDrive\Рабочий стол\Задачи\MouseCheeseGame\MouseCheeseGame\obj\Debug\MouseCheeseGame.Form1.resources
