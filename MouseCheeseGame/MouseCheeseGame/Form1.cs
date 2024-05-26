@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using WMPLib;
@@ -21,6 +22,10 @@ namespace MouseCheeseGame
         private int catX, catY;
         private int trap1X, trap1Y, trap2X, trap2Y;
 
+        private bool cheeseFound = false;
+        private bool catFound = false;
+        private bool trapFound = false; // добавим переменную для отслеживания того, найден ли сыр
+
         private Random random = new Random();
 
         private Timer catTimer;
@@ -37,7 +42,7 @@ namespace MouseCheeseGame
 
             player.URL = @"Music\music.mp3";
             player.controls.play();
-            player.settings.volume = 10;
+            player.settings.volume = 4;
             player.settings.setMode("loop", true);
         }
 
@@ -115,258 +120,6 @@ namespace MouseCheeseGame
             catTimer.Interval = 400; // Интервал в миллисекундах
             catTimer.Tick += CatTimer_Tick;
             catTimer.Start();
-        }
-
-        private void CatTimer_Tick(object sender, EventArgs e)
-        {
-            MoveCat();
-        }
-
-        private void InitializeMap()
-        {
-            map = new PictureBox[MapSize, MapSize];
-
-            for (int i = 0; i < MapSize; i++)
-            {
-                for (int j = 0; j < MapSize; j++)
-                {
-                    map[i, j] = new PictureBox();
-                    map[i, j].Size = new Size(CellSize, CellSize);
-                    map[i, j].Location = new Point(j * CellSize, i * CellSize);
-                    map[i, j].SizeMode = PictureBoxSizeMode.StretchImage;
-                    map[i, j].Click += Map_Click; // Добавляем обработчик клика на каждую ячейку
-
-                    // Если текущая ячейка - препятствие, устанавливаем ей фоновое изображение зеленого цвета
-                    if (obstacleMap[i, j])
-                    {
-                        //map[i, j].BackgroundImage = CreateGreenImage();
-                        map[i, j].Image = Image.FromFile(@"Images\cheesebg.png");
-                    }
-                    else
-                    {
-                        map[i, j].BackgroundImage = CreateYellowImage();
-                    }
-
-                    Controls.Add(map[i, j]);
-                }
-            }
-
-            mouse = new PictureBox();
-            mouse.Image = Image.FromFile(@"Images\mouse.png");
-            mouse.Size = new Size(CellSize, CellSize);
-            mouse.BackColor = Color.FromArgb(255, 247, 153);
-
-            cheese = new PictureBox();
-            cheese.Image = Image.FromFile(@"Images\cheese.png");
-            cheese.Size = new Size(CellSize, CellSize);
-
-            cat = new PictureBox();
-            cat.Image = Image.FromFile(@"Images\cat.png");
-            cat.Size = new Size(CellSize, CellSize);
-
-            trap = new PictureBox();
-            trap.Image = Image.FromFile(@"Images\trap.png");
-            trap.Size = new Size(CellSize, CellSize);
-
-            // Добавляем обработчик нажатия клавиш
-            this.KeyPreview = true;
-            this.KeyDown += new KeyEventHandler(Form1_KeyDown);
-        }
-
-        private void PlaceObjects(int level)
-        {
-            if (level == 1)
-            {
-                mouseX = 6;
-                mouseY = 10;
-                cheeseX = random.Next(1, MapSize);
-                cheeseY = GenerateRandomValidPositionY();
-                catX = 13;
-                catY = 10;
-                trap1X = 12;
-                trap1Y = 2;
-                trap2X = 12;
-                trap2Y = 18;
-            }
-
-            map[mouseX, mouseY].Image = mouse.Image;
-            map[cheeseX, cheeseY].Image = cheese.Image;
-            map[catX, catY].Image = cat.Image;
-            map[trap1X, trap1Y].Image = trap.Image;
-            map[trap2X, trap2Y].Image = trap.Image;
-        }
-
-        // Generate a random X position for the cheese while avoiding forbidden locations
-        private int GenerateRandomValidPositionX()
-        {
-            int x;
-            do
-            {
-                x = random.Next(1, MapSize);
-            } while (x == mouseX || x == catX || x == trap1X || x == trap2X || obstacleMap[x, mouseY]);
-            return x;
-        }
-
-        // Generate a random Y position for the cheese while avoiding forbidden locations
-        private int GenerateRandomValidPositionY()
-        {
-            int y;
-            do
-            {
-                y = random.Next(1, MapSize);
-            } while (y == mouseY || y == catY || y == trap1Y || y == trap2Y || obstacleMap[cheeseX, y]);
-            return y;
-        }
-
-        private void Form1_KeyDown(object sender, KeyEventArgs e)
-        {
-            switch (e.KeyCode)
-            {
-                case Keys.W: // Нажата клавиша W (вверх)
-                    MoveMouse(mouseX - 1, mouseY);
-                    break;
-                case Keys.S: // Нажата клавиша S (вниз)
-                    MoveMouse(mouseX + 1, mouseY);
-                    break;
-                case Keys.A: // Нажата клавиша A (влево)
-                    MoveMouse(mouseX, mouseY - 1);
-                    break;
-                case Keys.D: // Нажата клавиша D (вправо)
-                    MoveMouse(mouseX, mouseY + 1);
-                    break;
-            }
-        }
-
-        private void MoveMouse(int newX, int newY)
-        {
-            // Проверяем, чтобы новые координаты находились в пределах карты
-            if (newX >= 0 && newX < MapSize && newY >= 0 && newY < MapSize && !obstacleMap[newX, newY])
-            {
-                // Убираем мышку с текущей позиции на карте
-                map[mouseX, mouseY].Image = null;
-
-                // Устанавливаем новые координаты для мышки
-                mouseX = newX;
-                mouseY = newY;
-
-                // Проверяем на столкновения
-                CheckCollision();
-
-                // Устанавливаем изображение для новой позиции мышки
-                map[mouseX, mouseY].Image = mouse.Image;
-            }
-        }
-
-        private bool cheeseFound = false;
-        private bool catFound = false;
-        private bool trapFound = false; // добавим переменную для отслеживания того, найден ли сыр
-
-        private void CheckCollision()
-        {
-            if (!catFound && mouseX == catX && mouseY == catY)
-            {
-                catFound = true;
-                MessageBox.Show("Вы встретили кота и проиграли!");
-                ResetGame();
-            }
-            else if (!trapFound && (mouseX == trap1X && mouseY == trap1Y || mouseX == trap2X && mouseY == trap2Y))
-            {
-                trapFound = true;
-                MessageBox.Show("Вы попали в мышеловку и проиграли!");
-                ResetGame();
-            }
-            else if (!cheeseFound && mouseX == cheeseX && mouseY == cheeseY)
-            {
-                cheeseFoundCount++; // Increment the count of found cheese pieces
-                map[cheeseX, cheeseY].Image = null; // Remove the cheese from the map
-                if (cheeseFoundCount >= 5) // Check if 5 cheese pieces are found
-                {
-                    cheeseFound = true;
-                    ShowCongratulations();
-                    ResetGame();
-                }
-                else
-                {
-                    cheeseX = random.Next(1, MapSize); // Place a new cheese randomly
-                    cheeseY = GenerateRandomValidPositionY();
-                    map[cheeseX, cheeseY].Image = cheese.Image; // Show the new cheese on the map
-                }
-            }
-        }
-
-
-        private void ResetGame()
-        {
-            cheeseFound = false;
-            catFound = false;
-            trapFound = false;
-            cheeseFoundCount = 0;
-            map[catX, catY].Image = null;
-            map[cheeseX, cheeseY].Image = null;
-            /*for (int i = 0; i < MapSize; i++)
-            {
-                for (int j = 0; j < MapSize; j++)
-                {
-                    map[i, j].Image = null;
-                }
-            }*/
-
-
-
-            GenerateObstacles(1); // Генерируем новый лабиринт препятствий
-            PlaceObjects(1);
-        }
-
-        private void Map_Click(object sender, EventArgs e)
-        {
-            PictureBox clickedCell = sender as PictureBox;
-            int clickedRow = clickedCell.Location.Y / CellSize;
-            int clickedCol = clickedCell.Location.X / CellSize;
-
-            int dx = Math.Abs(clickedRow - mouseX);
-            int dy = Math.Abs(clickedCol - mouseY);
-
-            if ((dx == 1 && dy == 0) || (dx == 0 && dy == 1))
-            {
-                MoveMouse(clickedRow, clickedCol);
-            }
-        }
-
-        private void MoveCat()
-        {
-            int dx = mouseX - catX;
-            int dy = mouseY - catY;
-
-            // Определяем направление движения кота по горизонтали и вертикали
-            int moveX = 0;
-            int moveY = 0;
-
-            // Если кот дальше по горизонтали, двигаемся в этом направлении
-            if (Math.Abs(dx) > Math.Abs(dy))
-                moveX = Math.Sign(dx);
-            // Иначе двигаемся по вертикали
-            else
-                moveY = Math.Sign(dy);
-
-            int newX = catX + moveX;
-            int newY = catY + moveY;
-
-            // Проверяем, чтобы новые координаты находились в пределах карты
-            if (newX >= 0 && newX < MapSize && newY >= 0 && newY < MapSize && !obstacleMap[newX, newY])
-            {
-                // Перемещаем кота
-                if (newX != cheeseX || newY != cheeseY)
-                {
-                    // Перемещаем кошку
-                    map[catX, catY].Image = null;
-                    catX = newX;
-                    catY = newY;
-                    map[catX, catY].Image = cat.Image;
-                }
-            }
-
-            // Проверяем столкновения после каждого хода кота
-            CheckCollision();
         }
 
         private void GenerateObstacles(int level)
@@ -478,6 +231,72 @@ namespace MouseCheeseGame
             }
         }
 
+        private void InitializeMap()
+        {
+            map = new PictureBox[MapSize, MapSize];
+
+            for (int i = 0; i < MapSize; i++)
+            {
+                for (int j = 0; j < MapSize; j++)
+                {
+                    map[i, j] = new PictureBox();
+                    map[i, j].Size = new Size(CellSize, CellSize);
+                    map[i, j].Location = new Point(j * CellSize, i * CellSize);
+                    map[i, j].SizeMode = PictureBoxSizeMode.StretchImage;
+                    map[i, j].Click += Map_Click; // Добавляем обработчик клика на каждую ячейку
+
+                    // Если текущая ячейка - препятствие, устанавливаем ей фоновое изображение зеленого цвета
+                    if (obstacleMap[i, j])
+                    {
+                        //map[i, j].BackgroundImage = CreateGreenImage();
+                        map[i, j].Image = Image.FromFile(@"Images\cheesebg.png");
+                    }
+                    else
+                    {
+                        map[i, j].BackgroundImage = CreateYellowImage();
+                    }
+
+                    Controls.Add(map[i, j]);
+                }
+            }
+
+            mouse = new PictureBox();
+            mouse.Image = Image.FromFile(@"Images\mouse.png");
+            mouse.Size = new Size(CellSize, CellSize);
+            mouse.BackColor = Color.FromArgb(255, 247, 153);
+
+            cheese = new PictureBox();
+            cheese.Image = Image.FromFile(@"Images\cheese.png");
+            cheese.Size = new Size(CellSize, CellSize);
+
+            cat = new PictureBox();
+            cat.Image = Image.FromFile(@"Images\cat.png");
+            cat.Size = new Size(CellSize, CellSize);
+
+            trap = new PictureBox();
+            trap.Image = Image.FromFile(@"Images\trap.png");
+            trap.Size = new Size(CellSize, CellSize);
+
+            // Добавляем обработчик нажатия клавиш
+            this.KeyPreview = true;
+            this.KeyDown += new KeyEventHandler(Form1_KeyDown);
+        }
+
+        private void Map_Click(object sender, EventArgs e)
+        {
+            PictureBox clickedCell = sender as PictureBox;
+            int clickedRow = clickedCell.Location.Y / CellSize;
+            int clickedCol = clickedCell.Location.X / CellSize;
+
+            int dx = Math.Abs(clickedRow - mouseX);
+            int dy = Math.Abs(clickedCol - mouseY);
+
+            if ((dx == 1 && dy == 0) || (dx == 0 && dy == 1))
+            {
+                MoveMouse(clickedRow, clickedCol);
+            }
+        }
+
         private Image CreateYellowImage()
         {
             Color pastelYellow = Color.FromArgb(255, 247, 153);
@@ -487,6 +306,306 @@ namespace MouseCheeseGame
                 g.Clear(pastelYellow);
             }
             return bitmap;
+        }
+
+        private void PlaceObjects(int level)
+        {
+            if (level == 1)
+            {
+                mouseX = 6;
+                mouseY = 10;
+                cheeseX = random.Next(1, MapSize);
+                cheeseY = GenerateRandomValidPositionY();
+                catX = 13;
+                catY = 10;
+                trap1X = 12;
+                trap1Y = 2;
+                trap2X = 12;
+                trap2Y = 18;
+            }
+
+            map[mouseX, mouseY].Image = mouse.Image;
+            map[cheeseX, cheeseY].Image = cheese.Image;
+            map[catX, catY].Image = cat.Image;
+            map[trap1X, trap1Y].Image = trap.Image;
+            map[trap2X, trap2Y].Image = trap.Image;
+        }
+
+        // Generate a random X position for the cheese while avoiding forbidden locations
+        private int GenerateRandomValidPositionX()
+        {
+            int x;
+            do
+            {
+                x = random.Next(1, MapSize);
+            } while (x == mouseX || x == catX || x == trap1X || x == trap2X || obstacleMap[x, mouseY]);
+            return x;
+        }
+
+        // Generate a random Y position for the cheese while avoiding forbidden locations
+        private int GenerateRandomValidPositionY()
+        {
+            int y;
+            do
+            {
+                y = random.Next(1, MapSize);
+            } while (y == mouseY || y == catY || y == trap1Y || y == trap2Y || obstacleMap[cheeseX, y]);
+            return y;
+        }
+
+        private void CatTimer_Tick(object sender, EventArgs e)
+        {
+            MoveCat();
+        }
+
+        private void Form1_KeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.KeyCode)
+            {
+                case Keys.W: // Нажата клавиша W (вверх)
+                    MoveMouse(mouseX - 1, mouseY);
+                    break;
+                case Keys.S: // Нажата клавиша S (вниз)
+                    MoveMouse(mouseX + 1, mouseY);
+                    break;
+                case Keys.A: // Нажата клавиша A (влево)
+                    MoveMouse(mouseX, mouseY - 1);
+                    break;
+                case Keys.D: // Нажата клавиша D (вправо)
+                    MoveMouse(mouseX, mouseY + 1);
+                    break;
+            }
+        }
+
+        private void MoveMouse(int newX, int newY)
+        {
+            // Проверяем, чтобы новые координаты находились в пределах карты
+            if (newX >= 0 && newX < MapSize && newY >= 0 && newY < MapSize && !obstacleMap[newX, newY])
+            {
+                // Убираем мышку с текущей позиции на карте
+                map[mouseX, mouseY].Image = null;
+
+                // Устанавливаем новые координаты для мышки
+                mouseX = newX;
+                mouseY = newY;
+
+                // Проверяем на столкновения
+                CheckCollision();
+
+                // Устанавливаем изображение для новой позиции мышки
+                map[mouseX, mouseY].Image = mouse.Image;
+            }
+        }
+
+        private void MoveCat()
+        {
+            // Создаем двумерный массив для хранения информации о посещенных клетках
+            bool[,] visited = new bool[MapSize, MapSize];
+            // Массив для хранения предков клеток, чтобы можно было восстановить путь
+            (int, int)[,] previous = new (int, int)[MapSize, MapSize];
+
+            // Очистка массивов
+            for (int i = 0; i < MapSize; i++)
+            {
+                for (int j = 0; j < MapSize; j++)
+                {
+                    visited[i, j] = false;
+                    previous[i, j] = (-1, -1);
+                }
+            }
+
+            // Очередь для обхода клеток в ширину
+            Queue<(int, int)> queue = new Queue<(int, int)>();
+
+            // Начальная позиция кота
+            queue.Enqueue((catX, catY));
+            visited[catX, catY] = true;
+
+            bool foundPath = false;
+
+            while (queue.Count > 0)
+            {
+                // Извлекаем клетку из очереди
+                var (currentX, currentY) = queue.Dequeue();
+
+                // Если кот добрался до мыши, завершаем поиск
+                if (currentX == mouseX && currentY == mouseY)
+                {
+                    foundPath = true;
+                    break;
+                }
+
+                // Проверяем соседние клетки на доступность и добавляем их в очередь, если они не посещены
+                int[] dx = { -1, 1, 0, 0 };
+                int[] dy = { 0, 0, -1, 1 };
+
+                for (int i = 0; i < 4; i++)
+                {
+                    int nextX = currentX + dx[i];
+                    int nextY = currentY + dy[i];
+
+                    // Проверяем, находится ли следующая клетка в пределах карты и не является ли препятствием, ловушкой или сыром
+                    if (nextX >= 0 && nextX < MapSize && nextY >= 0 && nextY < MapSize &&
+                        !obstacleMap[nextX, nextY] && !visited[nextX, nextY])
+                    {
+                        // Избегаем ловушки и сыр, но продолжаем искать пути
+                        if ((nextX == trap1X && nextY == trap1Y) || (nextX == trap2X && nextY == trap2Y) ||
+                            (nextX == cheeseX && nextY == cheeseY))
+                        {
+                            continue;
+                        }
+
+                        queue.Enqueue((nextX, nextY));
+                        visited[nextX, nextY] = true;
+                        previous[nextX, nextY] = (currentX, currentY);
+                    }
+                }
+            }
+
+            if (foundPath)
+            {
+                // Восстанавливаем путь от мыши к коту
+                int targetX = mouseX;
+                int targetY = mouseY;
+
+                Stack<(int, int)> path = new Stack<(int, int)>();
+                while (previous[targetX, targetY] != (-1, -1))
+                {
+                    path.Push((targetX, targetY));
+                    (targetX, targetY) = previous[targetX, targetY];
+                }
+
+                // Двигаем кота по найденному пути
+                if (path.Count > 0)
+                {
+                    var (nextX, nextY) = path.Peek();
+                    MoveCatAlongPath(nextX, nextY);
+                }
+            }
+            else
+            {
+                // Если кот не может найти путь к мыши, просто перемещаем его в случайном направлении
+                MoveCatRandomly();
+            }
+        }
+
+        private void MoveCatAlongPath(int targetX, int targetY)
+        {
+            // Определяем направление движения кота по горизонтали и вертикали
+            int moveX = 0;
+            int moveY = 0;
+
+            // Находим направление движения кота
+            if (targetX < catX && !obstacleMap[catX - 1, catY] && !(catX - 1 == trap1X && catY == trap1Y) && !(catX - 1 == trap2X && catY == trap2Y) && !(catX - 1 == cheeseX && catY == cheeseY))
+                moveX = -1;
+            else if (targetX > catX && !obstacleMap[catX + 1, catY] && !(catX + 1 == trap1X && catY == trap1Y) && !(catX + 1 == trap2X && catY == trap2Y) && !(catX + 1 == cheeseX && catY == cheeseY))
+                moveX = 1;
+            if (targetY < catY && !obstacleMap[catX, catY - 1] && !(catX == trap1X && catY - 1 == trap1Y) && !(catX == trap2X && catY - 1 == trap2Y) && !(catX == cheeseX && catY - 1 == cheeseY))
+                moveY = -1;
+            else if (targetY > catY && !obstacleMap[catX, catY + 1] && !(catX == trap1X && catY + 1 == trap1Y) && !(catX == trap2X && catY + 1 == trap2Y) && !(catX == cheeseX && catY + 1 == cheeseY))
+                moveY = 1;
+
+            // Перемещаем кота
+            int newX = catX + moveX;
+            int newY = catY + moveY;
+
+            // Проверяем, чтобы новые координаты находились в пределах карты
+            if (newX >= 0 && newX < MapSize && newY >= 0 && newY < MapSize && !obstacleMap[newX, newY] &&
+                !(newX == trap1X && newY == trap1Y) && !(newX == trap2X && newY == trap2Y) && !(newX == cheeseX && newY == cheeseY))
+            {
+                // Перемещаем кота
+                map[catX, catY].Image = null;
+                catX = newX;
+                catY = newY;
+                map[catX, catY].Image = cat.Image;
+            }
+
+            // Проверяем столкновения после каждого хода кота
+            CheckCollision();
+        }
+
+        private void MoveCatRandomly()
+        {
+            // Создаем список доступных направлений для перемещения
+            List<(int, int)> availableDirections = new List<(int, int)>();
+
+            // Проверяем доступность каждого направления и добавляем его в список, если клетка свободна и не содержит ловушки или сыра
+            if (catX - 1 >= 0 && !obstacleMap[catX - 1, catY] && !(catX - 1 == trap1X && catY == trap1Y) && !(catX - 1 == trap2X && catY == trap2Y) && !(catX - 1 == cheeseX && catY == cheeseY))
+                availableDirections.Add((-1, 0)); // Вверх
+            if (catX + 1 < MapSize && !obstacleMap[catX + 1, catY] && !(catX + 1 == trap1X && catY == trap1Y) && !(catX + 1 == trap2X && catY == trap2Y) && !(catX + 1 == cheeseX && catY == cheeseY))
+                availableDirections.Add((1, 0)); // Вниз
+            if (catY - 1 >= 0 && !obstacleMap[catX, catY - 1] && !(catX == trap1X && catY - 1 == trap1Y) && !(catX == trap2X && catY - 1 == trap2Y) && !(catX == cheeseX && catY - 1 == cheeseY))
+                availableDirections.Add((0, -1)); // Влево
+            if (catY + 1 < MapSize && !obstacleMap[catX, catY + 1] && !(catX == trap1X && catY + 1 == trap1Y) && !(catX == trap2X && catY + 1 == trap2Y) && !(catX == cheeseX && catY + 1 == cheeseY))
+                availableDirections.Add((0, 1)); // Вправо
+
+            // Если доступны какие-либо направления, выбираем случайное направление и перемещаем кота
+            if (availableDirections.Count > 0)
+            {
+                // Выбираем случайное доступное направление
+                Random rnd = new Random();
+                int randomIndex = rnd.Next(0, availableDirections.Count);
+                var (moveX, moveY) = availableDirections[randomIndex];
+
+                // Перемещаем кота
+                int newX = catX + moveX;
+                int newY = catY + moveY;
+
+                map[catX, catY].Image = null;
+                catX = newX;
+                catY = newY;
+                map[catX, catY].Image = cat.Image;
+
+                // Проверяем столкновения после перемещения кота
+                CheckCollision();
+            }
+            // Если все направления заблокированы, кот остается на месте
+        }
+
+        private void CheckCollision()
+        {
+            if (!catFound && mouseX == catX && mouseY == catY)
+            {
+                catFound = true;
+                MessageBox.Show("Вы встретили кота и проиграли!");
+                ResetGame();
+            }
+            else if (!trapFound && (mouseX == trap1X && mouseY == trap1Y || mouseX == trap2X && mouseY == trap2Y))
+            {
+                trapFound = true;
+                MessageBox.Show("Вы попали в мышеловку и проиграли!");
+                ResetGame();
+            }
+            else if (!cheeseFound && mouseX == cheeseX && mouseY == cheeseY)
+            {
+                cheeseFoundCount++; // Increment the count of found cheese pieces
+                map[cheeseX, cheeseY].Image = null; // Remove the cheese from the map
+                if (cheeseFoundCount >= 5) // Check if 5 cheese pieces are found
+                {
+                    cheeseFound = true;
+                    ShowCongratulations();
+                    ResetGame();
+                }
+                else
+                {
+                    cheeseX = random.Next(1, MapSize); // Place a new cheese randomly
+                    cheeseY = GenerateRandomValidPositionY();
+                    map[cheeseX, cheeseY].Image = cheese.Image; // Show the new cheese on the map
+                }
+            }
+        }
+
+        private void ResetGame()
+        {
+            cheeseFound = false;
+            catFound = false;
+            trapFound = false;
+            cheeseFoundCount = 0;
+            map[catX, catY].Image = null;
+            map[cheeseX, cheeseY].Image = null;
+
+            GenerateObstacles(1); // Генерируем новый лабиринт препятствий
+            PlaceObjects(1);
         }
 
         private void ShowCongratulations()
